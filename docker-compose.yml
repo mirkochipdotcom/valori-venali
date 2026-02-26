@@ -15,7 +15,7 @@ services:
     networks:
       - valori_net
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,6 +38,8 @@ services:
       APP_SECRET: ${APP_SECRET}
       APP_ADMIN_USER: ${APP_ADMIN_USER}
       APP_ADMIN_PASS: ${APP_ADMIN_PASS}
+      COMUNE_NOME: ${COMUNE_NOME}
+      COMUNE_PROVINCIA: ${COMUNE_PROVINCIA}
     volumes:
       - ./src:/var/www/html
     ports:
