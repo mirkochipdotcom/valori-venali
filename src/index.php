@@ -12,7 +12,7 @@ seedAdmin();
 
 // ── Raccolta dati per i select ──────────────────────────────────────────────
 $periodi    = DB::query('SELECT DISTINCT Periodo FROM valori_omi ORDER BY Periodo DESC');
-$fogli      = DB::query('SELECT foglio_catastale, zona_omi FROM fogli_zone_omi ORDER BY foglio_catastale');
+$fogli      = DB::query('SELECT foglio_catastale, zona_omi FROM fogli_zone_omi ORDER BY CAST(foglio_catastale AS UNSIGNED) ASC');
 $destinazioni = DB::query('SELECT DISTINCT destinazione FROM omi_destinazione_urbanistica ORDER BY destinazione');
 $abbattimenti = DB::query('SELECT id_coefficiente, descrizione, valore FROM omi_abbattimenti ORDER BY descrizione');
 
@@ -82,10 +82,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['calcola'])) {
         } elseif (!$abb_row) {
             $erroreCalcolo = "Coefficiente di abbattimento non trovato.";
         } else {
+            $oneri_adattamento_check = isset($_POST['oneri_adattamento']);
+            
             $coeff_dest = (float) $dest_row['coefficiente_destinazione'];
             $coeff_abb  = (float) $abb_row['valore'];
-            $valore_unitario = $valore_omi * $coeff_dest * $coeff_abb;
-            $valore_totale   = $valore_unitario * $superficie;
+            
+            // Logica Montesilvano: VMR è il 20% del valore OMI
+            $vmr = $valore_omi * 0.2;
+            
+            $valore_unitario = $vmr * $coeff_dest * $coeff_abb;
+            
+            // Detrazione oneri adattamento (5%)
+            $sconto_oneri = 0;
+            if ($oneri_adattamento_check) {
+                $sconto_oneri = $valore_unitario * 0.05;
+                $valore_unitario -= $sconto_oneri;
+            }
+
+            $valore_totale = $valore_unitario * $superficie;
 
             $risultato = [
                 'periodo'            => $periodo,
@@ -96,9 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['calcola'])) {
                 'destinazione'       => $destinazione,
                 'superficie'         => $superficie,
                 'valore_omi'         => $valore_omi,
+                'vmr'                => $vmr,
                 'coeff_dest'         => $coeff_dest,
                 'coeff_abb'          => $coeff_abb,
                 'desc_abb'           => $abb_row['descrizione'],
+                'oneri_adattamento'  => $oneri_adattamento_check,
+                'sconto_oneri'       => $sconto_oneri,
                 'valore_unitario'    => $valore_unitario,
                 'valore_totale'      => $valore_totale,
             ];
@@ -222,6 +239,19 @@ include __DIR__ . '/layout/header.php';
             </div>
           </div>
 
+          <div class="mb-4 p-3 bg-light rounded-3 border">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="oneri_adattamento" name="oneri_adattamento"
+                <?= isset($_POST['oneri_adattamento']) ? 'checked' : '' ?>>
+              <label class="form-check-label fw-semibold" for="oneri_adattamento">
+                🛠️ Oneri di adattamento (-5%)
+              </label>
+              <div class="form-text small">
+                Selezionare in caso di necessità di rilevanti interventi di adattamento ai fini edificatori (risultanti da perizia tecnica).
+              </div>
+            </div>
+          </div>
+
           <div class="d-grid">
             <button type="submit" class="btn btn-primary btn-lg">
               📊 Calcola Stima
@@ -285,27 +315,40 @@ include __DIR__ . '/layout/header.php';
               </tr>
               <tr>
                 <td class="text-muted ps-3">Valore OMI di riferimento</td>
-                <td class="fw-semibold"><?= number_format($risultato['valore_omi'], 2, ',', '.') ?> €/m²</td>
+                <td class="fw-semibold text-end"><?= number_format($risultato['valore_omi'], 2, ',', '.') ?> €/m²</td>
               </tr>
               <tr>
-                <td class="text-muted ps-3">Coefficiente destinazione</td>
-                <td class="fw-semibold"><?= number_format($risultato['coeff_dest'], 4, ',', '.') ?></td>
+                <td class="text-muted ps-3">VMR (20% del Valore OMI)</td>
+                <td class="fw-semibold text-end"><?= number_format($risultato['vmr'], 2, ',', '.') ?> €/m²</td>
               </tr>
               <tr>
-                <td class="text-muted ps-3">Stato conservativo</td>
-                <td class="fw-semibold"><?= htmlspecialchars($risultato['desc_abb']) ?> (× <?= number_format($risultato['coeff_abb'], 2, ',', '.') ?>)</td>
+                <td class="text-muted ps-3">Coefficiente destinazione (IDU)</td>
+                <td class="fw-semibold text-end"><?= number_format($risultato['coeff_dest'], 4, ',', '.') ?></td>
               </tr>
+              <tr>
+                <td class="text-muted ps-3">Stato conservativo (CA)</td>
+                <td class="fw-semibold text-end">
+                    <?= htmlspecialchars($risultato['desc_abb']) ?><br>
+                    <span class="small text-muted">× <?= number_format($risultato['coeff_abb'], 2, ',', '.') ?></span>
+                </td>
+              </tr>
+              <?php if ($risultato['oneri_adattamento']): ?>
+                <tr class="table-warning">
+                  <td class="text-muted ps-3 font-italic">Oneri adattamento (-5%)</td>
+                  <td class="text-danger text-end fw-semibold">- <?= number_format($risultato['sconto_oneri'], 2, ',', '.') ?> €/m²</td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
         <div class="card-footer bg-light">
           <small class="text-muted">
-            <strong>Formula:</strong>
-            <?= number_format($risultato['superficie'], 2, ',', '.') ?> m²
-            × <?= number_format($risultato['valore_omi'], 2, ',', '.') ?> €/m²
-            × <?= number_format($risultato['coeff_dest'], 4, ',', '.') ?>
-            × <?= number_format($risultato['coeff_abb'], 2, ',', '.') ?>
-            = <strong><?= number_format($risultato['valore_totale'], 2, ',', '.') ?> €</strong>
+            <strong>Formula:</strong> [VMR
+            × IDU
+            × CA]
+            <?= $risultato['oneri_adattamento'] ? ' - 5%' : '' ?>
+            × Superfic. =
+            <strong><?= number_format($risultato['valore_totale'], 2, ',', '.') ?> €</strong>
           </small>
         </div>
       </div>

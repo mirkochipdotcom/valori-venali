@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$fogli = DB::query('SELECT foglio_catastale, zona_omi FROM fogli_zone_omi ORDER BY foglio_catastale + 0, foglio_catastale');
+$fogli = DB::query('SELECT foglio_catastale, zona_omi FROM fogli_zone_omi ORDER BY CAST(foglio_catastale AS UNSIGNED) ASC');
 $zone  = DB::query('SELECT DISTINCT Zona FROM valori_omi ORDER BY Zona');
 
 $isAdmin   = true;
