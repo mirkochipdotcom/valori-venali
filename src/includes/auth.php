@@ -94,14 +94,26 @@ function verifyCsrf(): void {
  * Crea l'utente admin dalla variabile d'ambiente se non esiste ancora
  */
 function seedAdmin(): void {
-    $count = DB::queryOne('SELECT COUNT(*) as n FROM users');
-    if ($count && $count['n'] == 0) {
-        $adminUser = getenv('APP_ADMIN_USER') ?: 'admin';
-        $adminPass = getenv('APP_ADMIN_PASS') ?: 'changeme123';
+    $adminUser = getenv('APP_ADMIN_USER') ?: 'admin';
+    $adminPass = getenv('APP_ADMIN_PASS') ?: 'changeme123';
+
+    $user = DB::queryOne('SELECT id, password_hash FROM users WHERE username = ? LIMIT 1', [$adminUser]);
+
+    if (!$user) {
+        // Crea l'utente se non esiste
         $hash = password_hash($adminPass, PASSWORD_BCRYPT);
         DB::execute(
             'INSERT INTO users (username, password_hash) VALUES (?, ?)',
             [$adminUser, $hash]
         );
+    } else {
+        // Sincronizza la password se cambiata nel .env
+        if (!password_verify($adminPass, $user['password_hash'])) {
+            $hash = password_hash($adminPass, PASSWORD_BCRYPT);
+            DB::execute(
+                'UPDATE users SET password_hash = ? WHERE id = ?',
+                [$hash, $user['id']]
+            );
+        }
     }
 }
