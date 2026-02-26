@@ -12,13 +12,36 @@ require_once __DIR__ . '/../includes/config.php';
 $pageTitle = $pageTitle ?? 'Valori Venali Aree Fabbricabili';
 $comuneNome = COMUNE_NOME;
 $comuneProv = COMUNE_PROVINCIA ? ' (' . COMUNE_PROVINCIA . ')' : '';
+
+// SEO Logic
+$seoDescription = SEO_DESCRIPTION;
+$seoKeywords    = SEO_KEYWORDS;
+$robots         = !empty($isAdmin) ? 'noindex, nofollow' : 'index, follow';
+$canonicalUrl   = APP_URL . $_SERVER['REQUEST_URI'];
 ?>
 <!DOCTYPE html>
 <html lang="it" data-bs-theme="light">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-  <meta name="robots" content="noindex, nofollow"/>
+  <meta name="robots" content="<?= $robots ?>"/>
+  <meta name="description" content="<?= htmlspecialchars($seoDescription) ?>"/>
+  <meta name="keywords" content="<?= htmlspecialchars($seoKeywords) ?>"/>
+  <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl) ?>"/>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>"/>
+  <meta property="og:title" content="<?= htmlspecialchars($pageTitle . ' — ' . $comuneNome) ?>"/>
+  <meta property="og:description" content="<?= htmlspecialchars($seoDescription) ?>"/>
+  <meta property="og:image" content="<?= APP_URL ?>/favicon.png"/>
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image"/>
+  <meta property="twitter:url" content="<?= htmlspecialchars($canonicalUrl) ?>"/>
+  <meta property="twitter:title" content="<?= htmlspecialchars($pageTitle . ' — ' . $comuneNome) ?>"/>
+  <meta property="twitter:description" content="<?= htmlspecialchars($seoDescription) ?>"/>
+
   <title><?= htmlspecialchars($pageTitle) ?> — <?= htmlspecialchars($comuneNome) ?></title>
 
   <!-- Bootstrap Italia -->
