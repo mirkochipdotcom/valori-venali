@@ -1,0 +1,54 @@
+services:
+
+  db:
+    image: mariadb:11
+    container_name: valori_venali_db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASS}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    networks:
+      - valori_net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ./docker/php
+    container_name: valori_venali_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      APP_SECRET: ${APP_SECRET}
+      APP_ADMIN_USER: ${APP_ADMIN_USER}
+      APP_ADMIN_PASS: ${APP_ADMIN_PASS}
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "${APP_PORT:-8080}:80"
+    networks:
+      - valori_net
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  valori_net:
+    driver: bridge

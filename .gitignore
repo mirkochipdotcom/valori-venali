@@ -1,0 +1,21 @@
+# Variabili d'ambiente locali (contengono segreti)
+.env
+
+# Log
+*.log
+logs/
+
+# Upload temporanei
+src/uploads/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Docker override locale
+docker-compose.override.yml

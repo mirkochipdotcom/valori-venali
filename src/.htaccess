@@ -1,0 +1,5 @@
+Options -Indexes
+
+# Redirect root a src/
+RewriteEngine On
+RewriteRule ^$ /index.php [L,R=301]
