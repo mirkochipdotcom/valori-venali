@@ -16,7 +16,7 @@ Applicativo web per il calcolo della **Stima dei Valori Venali delle Aree Fabbri
 
 ```bash
 # 1. Clona il repository
-git clone <repo-url>
+git clone https://github.com/mirkochipdotcom/valori-venali.git
 cd Valori.Venali
 
 # 2. Configura l'ambiente
@@ -102,3 +102,7 @@ docker compose down -v
 
 - **D.L. 504/1992** — Determinazione valore venale aree edificabili ai fini ICI/IMU
 - **OMI** — Osservatorio del Mercato Immobiliare, Agenzia delle Entrate
+
+## 📜 Licenza
+
+Questo progetto è distribuito sotto licenza **European Union Public Licence v. 1.2 (EUPL-1.2)**. Consulta il file [LICENSE](LICENSE) per i dettagli.
