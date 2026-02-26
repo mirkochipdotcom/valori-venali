@@ -128,8 +128,37 @@ $pageTitle = 'Calcolo Stima Valori Venali';
 include __DIR__ . '/layout/header.php';
 ?>
 
+<style>
+  @media print {
+    .d-print-none, .govbar, .site-header, .main-nav, .site-footer, .hero-section, #form-calcolo-container, .navbar, .breadcrumb {
+      display: none !important;
+    }
+    body { background: #fff !important; padding: 0 !important; }
+    .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; break-inside: avoid; }
+    .card-header { background: #f8f9fa !important; color: #000 !important; border-bottom: 1px solid #ddd !important; }
+    .result-card { background: #fff !important; color: #000 !important; border: 2px solid #000 !important; }
+    .result-card * { color: #000 !important; }
+    .result-card hr { border-color: #000 !important; }
+    .page-content { padding-top: 0 !important; }
+    .print-header { display: block !important; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
+  }
+  .print-header { display: none; }
+</style>
+
+<div class="print-header">
+    <div class="d-flex align-items-center gap-3">
+        <div style="font-size: 2rem;">🏗️</div>
+        <div>
+            <div class="fw-bold text-uppercase" style="letter-spacing: 0.1em;"><?= htmlspecialchars(COMUNE_NOME) ?></div>
+            <h1 class="h4 mb-0">Stima Valore Venale Area Fabbricabile</h1>
+            <div class="small text-muted">Documento generato il <?= date('d/m/Y \a\l\l\e H:i') ?></div>
+        </div>
+    </div>
+</div>
+
 <!-- ── Hero section ── -->
-<div class="py-4 mb-4 rounded-4" style="background: linear-gradient(135deg,#003d7a 0%,#0066cc 60%,#0099cc 100%); color:#fff; padding: 2.5rem 2rem;">
+<div class="py-4 mb-4 rounded-4 hero-section d-print-none" style="background: linear-gradient(135deg,#003d7a 0%,#0066cc 60%,#0099cc 100%); color:#fff; padding: 2.5rem 2rem;">
   <div class="row align-items-center">
     <div class="col-lg-8">
       <h2 class="fw-bold mb-2">📐 Stima Valori Venali Aree Fabbricabili</h2>
@@ -161,7 +190,7 @@ include __DIR__ . '/layout/header.php';
 
 <div class="row g-4">
   <!-- ── Form calcolo ── -->
-  <div class="col-lg-5">
+  <div class="col-lg-5" id="form-calcolo-container">
     <div class="card h-100">
       <div class="card-header">
         <h3 class="h6 mb-0">🔢 Dati per il Calcolo</h3>
@@ -266,15 +295,22 @@ include __DIR__ . '/layout/header.php';
   <div class="col-lg-7">
     <?php if ($risultato): ?>
       <!-- Card risultato -->
-      <div class="card border-0 mb-4" style="background: linear-gradient(135deg,#003d7a,#0066cc); color:#fff;">
+      <div class="card border-0 mb-4 result-card" style="background: linear-gradient(135deg,#003d7a,#0066cc); color:#fff;">
         <div class="card-body p-4">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <span style="font-size:2rem">💰</span>
-            <div>
-              <div class="small opacity-75">Valore Venale Stimato</div>
-              <div class="fw-bold" style="font-size:2.4rem; letter-spacing:-.02em;">
-                <?= number_format($risultato['valore_totale'], 2, ',', '.') ?> €
-              </div>
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <span style="font-size:2rem">💰</span>
+                <div>
+                  <div class="small opacity-75">Valore Venale Stimato</div>
+                  <div class="fw-bold" style="font-size:2.4rem; letter-spacing:-.02em;">
+                    <?= number_format($risultato['valore_totale'], 2, ',', '.') ?> €
+                  </div>
+                </div>
+            </div>
+            <div class="d-print-none">
+                <button onclick="window.print()" class="btn btn-light btn-sm fw-bold px-3">
+                    🖨️ Stampa Risultato
+                </button>
             </div>
           </div>
           <hr style="border-color:rgba(255,255,255,.3)">
@@ -362,7 +398,7 @@ include __DIR__ . '/layout/header.php';
     <?php else: ?>
 
       <!-- Box informativo quando non c'è ancora un calcolo -->
-      <div class="card mb-4" style="border-left: 4px solid #0066cc !important;">
+      <div class="card mb-4 d-print-none" style="border-left: 4px solid #0066cc !important;">
         <div class="card-body p-4">
           <h4 class="h5 fw-bold mb-3">Come funziona il calcolo</h4>
           <p class="text-muted">La stima viene calcolata applicando la formula OMI:</p>
@@ -398,7 +434,7 @@ include __DIR__ . '/layout/header.php';
         </div>
       </div>
 
-      <div class="card">
+      <div class="card d-print-none">
         <div class="card-body p-4">
           <h5 class="mb-2">📌 Riferimenti normativi</h5>
           <ul class="list-unstyled text-muted small">
