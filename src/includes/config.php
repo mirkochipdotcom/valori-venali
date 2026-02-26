@@ -17,6 +17,7 @@ define('COMUNE_PROVINCIA', getenv('COMUNE_PROVINCIA') ?: '');
 
 // Versione app
 define('APP_VERSION', '2.0.0');
+define('GITHUB_URL',  'https://github.com/mirkochipdotcom/valori-venali');
 
 // Percorso root
 define('ROOT_PATH', dirname(__DIR__));

@@ -10,10 +10,11 @@
         — Valori Venali Aree Fabbricabili
       </div>
       <div class="col-md-6 text-md-end mt-2 mt-md-0">
-        Valori OMI &copy; <a href="https://www.agenziaentrate.gov.it" target="_blank"
-           rel="noopener">Agenzia delle Entrate</a>
+        Valori OMI &copy; Agenzia delle Entrate
         &nbsp;
-        <span class="version-badge">v<?= APP_VERSION ?></span>
+        <a href="<?= GITHUB_URL ?>" target="_blank" class="text-decoration-none">
+          <span class="version-badge">v<?= APP_VERSION ?></span>
+        </a>
       </div>
     </div>
   </div>
