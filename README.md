@@ -1,4 +1,5 @@
 # 🏗️ Valori Venali Aree Fabbricabili
+![CI/CD - Valori Venali](https://github.com/mirkochipdotcom/valori-venali/actions/workflows/ci.yml/badge.svg)
 
 Applicativo web per il calcolo della **Stima dei Valori Venali delle Aree Fabbricabili**, basato sui valori OMI (Osservatorio del Mercato Immobiliare) dell'Agenzia delle Entrate.
 
