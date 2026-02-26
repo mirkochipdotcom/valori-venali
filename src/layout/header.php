@@ -220,6 +220,10 @@ $comuneProv = COMUNE_PROVINCIA ? ' (' . COMUNE_PROVINCIA . ')' : '';
           <a class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'fogli_omi.php' ? 'active' : '' ?>"
              href="<?= APP_URL ?>/admin/fogli_omi.php">🗺 Fogli Catastali</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'backup.php' ? 'active' : '' ?>"
+             href="<?= APP_URL ?>/admin/backup.php">💾 Backup</a>
+        </li>
         <li class="nav-item ms-auto">
           <a class="nav-link" href="<?= APP_URL ?>/logout.php">🚪 Esci</a>
         </li>

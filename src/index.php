@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['calcola'])) {
     }
 }
 
+$isAdmin   = isLoggedIn();
 $pageTitle = 'Calcolo Stima Valori Venali';
 include __DIR__ . '/layout/header.php';
 ?>
@@ -153,7 +154,7 @@ include __DIR__ . '/layout/header.php';
           <div class="alert alert-danger">⚠️ <?= htmlspecialchars($erroreCalcolo) ?></div>
         <?php endif; ?>
 
-        <form method="post" action="<?= APP_URL ?>/" id="form-calcolo" novalidate>
+        <form method="post" action="<?= APP_URL ?>/index.php" id="form-calcolo" novalidate>
           <input type="hidden" name="calcola" value="1">
 
           <div class="mb-3">
